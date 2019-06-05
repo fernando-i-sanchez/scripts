@@ -1,0 +1,69 @@
+#!/bin/bash
+
+echo Hello, what do you want to name your app?
+read appName
+
+echo press y if this is an api server
+read api_server
+
+echo Creating $appName app
+if [[ $api_server =~ ^[Yy]$ ]]
+then
+   rails new $appName -O --api --skip-coffee 
+else
+  rails new $appName -O --skip-coffee --skip-turbolinks
+fi
+
+echo move into app folder
+cd $appName
+
+echo add sqlite to gemfile
+echo "gem 'sqlite3', '~> 1.4'" >> Gemfile
+echo "gem 'rspec-rails'" >> Gemfile
+
+echo bundling
+bundle
+
+echo installing rspec
+rails generate rspec:install
+
+echo Creating database.yml file
+touch config/database.yml
+
+echo Append sqlit configs
+
+echo Creating database.yml
+
+echo "# SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
+#
+default: &default
+  adapter: sqlite3
+
+development:
+  <<: *default
+  database: db/development.sqlite3
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: db/test.sqlite3
+
+production:
+  <<: *default
+  database: db/production.sqlite3
+" >> config/database.yml
+
+echo Adding sequel-rails to gemfile
+echo "gem 'sequel-rails'" >> Gemfile
+echo creating db folder
+mkdir db
+echo Creating dev file
+touch db/development.sqlite3
+
+echo All done! Enjoy your app.
